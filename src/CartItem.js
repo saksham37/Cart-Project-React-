@@ -6,11 +6,6 @@ class CartItem extends React.Component{
     // we need to make a constructor to define the state
     constructor(){
         super();
-        this.state = {
-            title: 'Mobile Phone',
-            price: '69',
-            qty: 1
-        }
         this.increaseQuantity = ()=>{
             //setState form 1
             //  this.setState({
@@ -44,7 +39,7 @@ class CartItem extends React.Component{
     }
     //for a class component to be a react component, we need one method -- render()
     render(){
-        const {title, price, qty} = this.state;
+        const {title, price, qty} = this.props.product;
         return (
             <>
               <div className='cart-item'>
