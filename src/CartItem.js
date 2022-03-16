@@ -11,6 +11,7 @@ const CartItem = (props)=>{
                onDecreaseQuantity,
                onDeleteProduct
             } = props;
+            console.log(onIncreaseQuantity);
         return (
             <>
               <div className='cart-item'>

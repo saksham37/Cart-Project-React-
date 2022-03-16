@@ -1,34 +1,31 @@
 import React from 'react';
 import Navbar from './Navbar';
 import Cart from './Cart';
+import {db} from './firebase';
+
+
+
 class App extends React.Component{
   constructor(){
     super();
     this.state = {
-        products: [
-            {
-                title: 'Mobile Phone',
-                price: '69',
-                qty: 1,
-                id: 1,
-                img:'https://images.unsplash.com/photo-1567581935884-3349723552ca?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80'
-            },
-            {
-                title: 'Watch',
-                price: '78',
-                qty: 1,
-                id: 2,
-                img:'https://images.unsplash.com/photo-1524805444758-089113d48a6d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyMDg4MDd8MHwxfHNlYXJjaHwxfHx3YXRjaHxlbnwwfHx8fDE2NDY4NTc2MjQ&ixlib=rb-1.2.1&q=80&w=1080'
-            },
-            {
-                title: 'Laptop',
-                price: '65000',
-                qty: 1,
-                id: 3,
-                img:'https://media.istockphoto.com/photos/isolated-laptop-on-white-background-stock-photo-picture-id1294325987?s=612x612'
-            }
-        ]
+        products: [],
+        loading:true
     }
+}
+
+componentDidMount() {
+    db
+    .collection("Products")
+    .onSnapshot(snapshot => {
+
+      const products = snapshot.docs.map(doc => {
+        const data = doc.data();
+        data["id"] = doc.id;
+        return data;
+      });
+      this.setState({ products: products, loading: false });
+    });
 }
 handleIncreaseQuantity = (product)=>{
       console.log("Hey increase the quantity of ",product);
@@ -77,14 +74,31 @@ getCartTotal = ()=>{
   products.map((product)=>{CartTotal+=(product.qty*product.price)});
   return CartTotal;
 }
-
+addProduct = ()=>{
+  db
+  .collection('Products')
+  .add({
+    img: '',
+    price: 999,
+    qty: 4,
+    title: "Washing Machine",
+  })
+  .then((docRef)=>{
+    console.log("Product has been added",docRef);
+  })
+  .catch((error)=>{
+    console.log("Error",error);
+  });
+}
   render(){
-    const {products} = this.state;
+    const {products,loading} = this.state;
   return (
      <>
      <Navbar
        count={this.getCartCount()}
      />
+     {loading && <div>Loading Products...</div>}
+      <button onClick={this.addProduct} style={{padding:15,fontSize:25}}> Add Product </button>
      <Cart
           products = {products}
           onIncreaseQuantity={this.handleIncreaseQuantity}
