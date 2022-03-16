@@ -31,32 +31,66 @@ handleIncreaseQuantity = (product)=>{
       console.log("Hey increase the quantity of ",product);
       const products = this.state.products;
       let index = products.indexOf(product);
-      products[index].qty+=1;
-      this.setState(prevState=>{
-          return {
-              products: products
-          }
+      // products[index].qty+=1;
+      // this.setState(prevState=>{
+      //     return {
+      //         products: products
+      //     }
+      // })
+      //we will update the quantity in the firebase which will automaticall setState() and cause a re-render
+      const docRef = db
+                    .collection('Products')
+                    .doc(products[index].id);
+      
+      docRef
+      .update({
+        qty: products[index].qty + 1
       })
+      .then(()=>{
+        console.log("Document updated successfully");
+      })
+      .catch((err)=>{
+        console.log("Error",err);
+      });
 }
 handleDecreaseQuantity = (product)=>{
     console.log("Hey decrease the quantity of ", product);
     const products = this.state.products;
     let index = products.indexOf(product);
 
-    if(products[index].qty>0)
-    products[index].qty-=1;
-    else return;
+    if(products[index].qty===0)
+    return;
 
-    this.setState({
-        products
+    // this.setState({
+    //     products
+    // });
+    const docRef = db.collection('Products').doc(products[index].id);
+    docRef.update({
+      qty: products[index].qty-1
+    })
+    .then(()=>{
+      console.log("Document updated successfully");
+    })
+    .catch((err)=>{
+      console.log("Error",err);
     });
 }
 handleDeleteProduct = (productId)=>{
-    this.setState((prevState)=>{
-        return {
-            products: prevState.products.filter((item)=>item.id!=productId)
-        }
+    // this.setState((prevState)=>{
+    //     return {
+    //         products: prevState.products.filter((item)=>item.id!=productId)
+    //     }
+    // })
+    const docRef = db.collection('Products').doc(productId);
+
+    docRef
+    .delete()
+    .then(()=>{
+      console.log("Document Deleted successfully");
     })
+    .catch((err)=>{
+      console.log("Error",err);
+    });
 }
 getCartCount = ()=>{
   const products = this.state.products;
